@@ -1,0 +1,152 @@
+{
+  "timezone": "Australia/Sydney",
+  "site_url": "https://tyduc45.github.io/cpp-jobs-radar/",
+  "close_after_successful_misses": 3,
+  "sources": [
+    {
+      "type": "greenhouse",
+      "board": "canonical",
+      "company": "Canonical"
+    },
+    {
+      "type": "greenhouse",
+      "board": "cloudflare",
+      "company": "Cloudflare"
+    },
+    {
+      "type": "greenhouse",
+      "board": "mongodb",
+      "company": "MongoDB"
+    },
+    {
+      "type": "greenhouse",
+      "board": "databricks",
+      "company": "Databricks"
+    },
+    {
+      "type": "greenhouse",
+      "board": "figma",
+      "company": "Figma"
+    },
+    {
+      "type": "greenhouse",
+      "board": "discord",
+      "company": "Discord"
+    },
+    {
+      "type": "greenhouse",
+      "board": "roblox",
+      "company": "Roblox"
+    },
+    {
+      "type": "greenhouse",
+      "board": "epicgames",
+      "company": "Epic Games"
+    },
+    {
+      "type": "greenhouse",
+      "board": "janestreet",
+      "company": "Jane Street"
+    },
+    {
+      "type": "greenhouse",
+      "board": "imc",
+      "company": "IMC"
+    },
+    {
+      "type": "greenhouse",
+      "board": "jumptrading",
+      "company": "Jump Trading"
+    },
+    {
+      "type": "greenhouse",
+      "board": "towerresearchcapital",
+      "company": "Tower Research Capital"
+    },
+    {
+      "type": "greenhouse",
+      "board": "akunacapital",
+      "company": "Akuna Capital"
+    },
+    {
+      "type": "greenhouse",
+      "board": "gravitonresearchcapital",
+      "company": "Graviton"
+    },
+    {
+      "type": "greenhouse",
+      "board": "spacex",
+      "company": "SpaceX"
+    },
+    {
+      "type": "greenhouse",
+      "board": "rocketlab",
+      "company": "Rocket Lab"
+    },
+    {
+      "type": "greenhouse",
+      "board": "andurilindustries",
+      "company": "Anduril"
+    },
+    {
+      "type": "greenhouse",
+      "board": "waymo",
+      "company": "Waymo"
+    },
+    {
+      "type": "greenhouse",
+      "board": "graphcore",
+      "company": "Graphcore"
+    },
+    {
+      "type": "greenhouse",
+      "board": "tenstorrent",
+      "company": "Tenstorrent"
+    },
+    {
+      "type": "lever",
+      "board": "zoox",
+      "company": "Zoox"
+    },
+    {
+      "type": "lever",
+      "board": "shieldai",
+      "company": "Shield AI"
+    },
+    {
+      "type": "lever",
+      "board": "waabi",
+      "company": "Waabi"
+    },
+    {
+      "type": "lever",
+      "board": "q-ctrl",
+      "company": "Q-CTRL"
+    },
+    {
+      "type": "ashby",
+      "board": "openai",
+      "company": "OpenAI"
+    },
+    {
+      "type": "ashby",
+      "board": "applied",
+      "company": "Applied Intuition"
+    },
+    {
+      "type": "greenhouse",
+      "board": "anthropic",
+      "company": "Anthropic"
+    },
+    {
+      "type": "ashby",
+      "board": "cerebras",
+      "company": "Cerebras"
+    },
+    {
+      "type": "ashby",
+      "board": "redis",
+      "company": "Redis"
+    }
+  ]
+}

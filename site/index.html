@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="每天更新的全球 C++ 岗位看板，直接访问公司原始招聘页面。">
+  <meta name="color-scheme" content="light">
+  <title>C++ Jobs Radar · 全球岗位雷达</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#results">跳到岗位列表</a>
+  <header class="topbar"><a class="brand" href="./"><span class="brand-mark">C<span>++</span></span><span>JOBS RADAR</span></a><div class="header-right"><span class="edition">GLOBAL EDITION</span><a href="https://github.com/tyduc45/cpp-jobs-radar" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">C++ CAREER OBSERVATORY</p><h1>下一站，<span>从这里发现。</span></h1><p class="lede">全球 C++ 相关岗位，每天汇集，直达原始 JD。</p></div><div class="schedule"><span class="schedule-label">每日更新 / 悉尼时间</span><strong>00:00<span> AEST / AEDT</span></strong><span id="last-update">正在读取最近更新…</span></div></section>
+    <section class="stats" aria-label="岗位统计"><div><span>当前收录</span><strong id="total">—</strong><small>个开放岗位</small></div><div><span>最近 24 小时发现</span><strong id="new-total">—</strong><small>个岗位 · 非发布日期</small></div><div><span>招聘公司</span><strong id="companies-total">—</strong><small>家正在招聘</small></div><div><span>来源状态</span><strong id="sources-total">—</strong><small>本次成功 / 已配置</small></div></section>
+    <button id="filter-toggle" class="filter-toggle" type="button" aria-expanded="false" aria-controls="filter-panel">筛选岗位 · 国家 / 办公方式 / 工作性质 ＋</button>
+    <div class="workspace"><aside class="filters" id="filter-panel" aria-label="筛选岗位"><div class="filter-heading"><h2>筛选岗位</h2><button id="reset" class="text-button" type="button">重置</button></div>
+      <label for="search">关键词</label><div class="search-wrap"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="岗位、公司、技术栈" autocomplete="off"></div>
+      <label for="country">国家 / 地区</label><select id="country"><option value="">全部国家 / 地区</option></select>
+      <label for="location">城市 / 地点</label><input id="location" type="search" placeholder="如 Sydney、London、上海">
+      <label for="workplace">工作地点</label><select id="workplace"><option value="">全部办公方式</option><option value="remote">Remote · 远程</option><option value="onsite">On-site · 现场</option><option value="hybrid">Hybrid · 混合</option><option value="unknown">未注明</option></select>
+      <label for="contract">工作性质</label><select id="contract"><option value="">全部 · 含实习</option><option value="intern">Intern · 实习 / Co-op</option><option value="fulltime">Full-time · 全职</option><option value="parttime">Part-time · 兼职</option><option value="contract">Contract · 合同 / 临时</option><option value="unknown">未注明</option></select>
+      <label for="company">公司</label><select id="company"><option value="">全部公司</option></select>
+      <label for="match">C++ 匹配范围</label><select id="match"><option value="">标题或 JD 提及 C++</option><option value="title">仅标题含 C++</option><option value="description">仅 JD 提及 C++</option></select>
+      <label for="period">首次发现</label><select id="period"><option value="0">不限时间</option><option value="1">最近 24 小时</option><option value="7">最近 7 天</option><option value="30">最近 30 天</option></select>
+      <div class="coverage-note"><span class="mini-label">关于收录范围</span><p>包含全职与实习。标题或 JD 明确提及 C++ 即收录，不代表 C++ 是主要语言。</p><p>国家根据来源地址和城市识别；办公方式、性质缺少明确依据时标为“未注明”。远程岗位可能限制国家或时区，请核对原始 JD。</p></div>
+    </aside><section class="list-section" id="results" aria-labelledby="list-heading"><div class="list-toolbar"><div><h2 id="list-heading">岗位列表</h2><span id="result-count" role="status" aria-live="polite">正在加载…</span></div><label class="sort-label" for="sort">排序<select id="sort"><option value="newest">最近发现</option><option value="title">优先标题含 C++</option><option value="company">公司名称</option></select></label></div>
+      <div class="quick-filters" aria-label="快速筛选"><button id="all-jobs" class="active" type="button" aria-pressed="true">全部岗位</button><button id="intern-jobs" type="button" aria-pressed="false">实习 / Co-op <span id="intern-total"></span></button></div>
+      <div id="notice" class="notice" hidden></div><div id="jobs" class="jobs"><div class="empty">正在加载岗位数据…</div></div><div class="pagination"><button id="prev" type="button" disabled>← 上一页</button><span id="page-info"></span><button id="next" type="button" disabled>下一页 →</button></div>
+    </section></div>
+    <details class="source-details"><summary>数据来源与抓取状态 <span id="source-summary"></span></summary><div id="source-list" class="source-list"></div><p>“首次发现”是本系统首次收录时间。连续 3 次成功抓取均未出现的岗位会从列表移除；来源失败时保留上次数据。本站仅保存岗位摘要，完整内容请访问原始招聘页。</p></details>
+  </main>
+  <footer><span><b>C++</b> JOBS RADAR</span><span>公开招聘数据 · 每日自动更新 · 原始 JD 直达</span><a href="https://github.com/tyduc45/cpp-jobs-radar/actions" target="_blank" rel="noopener noreferrer">查看运行记录 ↗</a></footer>
+  <noscript><p>请启用 JavaScript 查看和筛选岗位，或直接查看 <a href="jobs.json">岗位 JSON 数据</a>。</p></noscript>
+</body>
+</html>
