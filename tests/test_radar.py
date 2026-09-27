@@ -1,9 +1,8 @@
-import copy
 import os
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import radar
 from classify import classify, countries_for
@@ -90,6 +89,12 @@ class StateTests(unittest.TestCase):
 
 
 class EmailTests(unittest.TestCase):
+    def setUp(self):
+        # Expected mock failures must not become real GitHub warning annotations.
+        quiet = patch("builtins.print")
+        quiet.start()
+        self.addCleanup(quiet.stop)
+
     def test_send_failure_retains_pending_then_success_deduplicates(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "state.json"

@@ -30,11 +30,11 @@ jobs:
     outputs:
       ready: ${{ steps.ready.outputs.ready }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           ref: main
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7.0.0
         with:
           python-version: '3.12'
       - name: Test data and email integrity
@@ -80,7 +80,7 @@ jobs:
       - name: Upload Pages artifact
         id: artifact
         if: always() && steps.persist.outcome == 'success'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: site
       - name: Website artifact ready
@@ -107,4 +107,4 @@ jobs:
     steps:
       - name: Deploy GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5.0.1
