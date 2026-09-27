@@ -26,6 +26,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 from classify import COUNTRIES, classify
+from eligibility import SCREENING_VERSION, screen_job, passes_screening, is_visible
 
 ROOT = Path(__file__).resolve().parent
 CPP = re.compile(r"(?<![A-Za-z0-9_])(?:c\s*\+\s*\+|c＋＋|cpp\b|c\s+plus\s+plus)(?![A-Za-z_])", re.I)
@@ -108,6 +109,7 @@ def make_job(source, raw_id, title, description, url, location="", **extra):
         "company": source["company"], "title": title, "url": url,
         "location": plain(location) or "未注明地点", "excerpt": excerpt,
         "match": "title" if CPP.search(title) else "description", **extra, **attributes,
+        "screening": screen_job(title, description),
     }
 
 
@@ -185,7 +187,8 @@ def fetch_source(source):
     else:
         raise ValueError(f"Unknown source type: {kind}")
     return {"id": source_id(source), "company": source["company"], "ok": True, "scanned": total,
-            "matched": len(jobs), "jobs": jobs}
+            "matched": len(jobs), "eligible": sum(passes_screening(j) for j in jobs),
+            "excluded": sum(j["screening"]["excluded"] for j in jobs), "jobs": jobs}
 
 
 def read_json(path, default=None):
@@ -213,7 +216,7 @@ def merge_results(state, results, now, close_after=3):
             key = job["id"]
             seen.add(key)
             old = jobs.get(key, {})
-            if not old:
+            if not old and passes_screening(job):
                 fresh += 1
             jobs[key] = {**old, **job, "first_seen": old.get("first_seen", now), "last_seen": now,
                          "active": True, "misses": 0, "notified_at": old.get("notified_at")}
@@ -238,7 +241,7 @@ def crawl(config, state_path):
             source = tasks[task]
             try:
                 result = task.result()
-                print(f"OK {source['company']}: {result['matched']} C++ / {result['scanned']} jobs", flush=True)
+                print(f"OK {source['company']}: {result['eligible']} visible, {result['excluded']} restricted / {result['matched']} C++ / {result['scanned']} jobs", flush=True)
             except Exception as exc:
                 result = {"id": source_id(source), "company": source["company"], "ok": False,
                           "scanned": 0, "matched": 0, "error": f"{type(exc).__name__}: {exc}"[:240]}
@@ -255,17 +258,25 @@ def crawl(config, state_path):
 
 def export_site(config, state_path, output):
     state = read_json(state_path, {"jobs": {}})
-    jobs = [{k: v for k, v in job.items() if k not in ("notified_at", "misses", "source_job_id")}
-            for job in state["jobs"].values() if job["active"]]
+    jobs = [{k: v for k, v in job.items() if k not in ("notified_at", "misses", "source_job_id", "screening")}
+            for job in state["jobs"].values() if is_visible(job)]
+    active = [j for j in state["jobs"].values() if j["active"]]
+    screening = {"version": SCREENING_VERSION,
+        "excluded": sum(bool(j.get("screening", {}).get("excluded")) for j in active),
+        "unreviewed": sum(j.get("screening", {}).get("version") != SCREENING_VERSION for j in active)}
     jobs.sort(key=lambda j: (j["first_seen"], j["company"], j["title"]), reverse=True)
     write_json(output, {"generated_at": datetime.now(timezone.utc).isoformat(), "timezone": config["timezone"],
         "last_success": state.get("last_success"), "last_attempt": state.get("last_attempt"),
         "new_count": state.get("last_new_count", 0), "sources": state.get("sources", []), "jobs": jobs,
-        "country_labels": {code: entry[0] for code, entry in COUNTRIES.items()}})
+        "country_labels": {code: entry[0] for code, entry in COUNTRIES.items()}, "screening": screening})
     print(f"Exported {len(jobs)} active jobs to {output}")
 
 
 def build_digest(jobs, config, sender, recipient):
+    # Defense in depth: no caller can accidentally bypass the common JD filter.
+    jobs = [job for job in jobs if passes_screening(job)]
+    if not jobs:
+        raise ValueError("No screened, unrestricted jobs to include in an email")
     digest_id = hashlib.sha256("\n".join(sorted(j["id"] for j in jobs)).encode()).hexdigest()[:32]
     message = EmailMessage()
     message["Subject"] = f"[C++ Jobs Radar] 发现 {len(jobs)} 个新岗位"
@@ -296,7 +307,7 @@ def build_digest(jobs, config, sender, recipient):
 
 def notify(config, state_path):
     state = read_json(state_path, {"jobs": {}})
-    pending = sorted((j for j in state["jobs"].values() if j["active"] and not j.get("notified_at")),
+    pending = sorted((j for j in state["jobs"].values() if is_visible(j) and not j.get("notified_at")),
                      key=lambda j: (j["first_seen"], j["company"], j["title"]), reverse=True)
     required = ["SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "MAIL_TO"]
     missing = [name for name in required if not os.environ.get(name)]

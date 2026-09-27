@@ -76,7 +76,8 @@ async function init() {
     $("sources-total").textContent = `${data.sources.filter(s => s.ok).length}/${data.sources.length}`;
     $("last-update").textContent = `最近抓取 ${date(data.last_attempt, true)}`;
     $("source-summary").textContent = `${data.sources.length} 个公司招聘源`;
-    $("source-list").innerHTML = data.sources.map(s => `<div class="source-row"><b>${escaped(s.company)}</b><span class="${s.ok ? "" : "failed"}">${s.ok ? `${s.matched} 个匹配 / ${s.scanned} 个岗位` : "暂时失败 · 保留旧数据"}</span></div>`).join("");
+    $("source-list").innerHTML = data.sources.map(s => `<div class="source-row"><b>${escaped(s.company)}</b><span class="${s.ok ? "" : "failed"}">${s.ok ? `${s.eligible ?? s.matched} 个显示 / ${s.excluded ?? 0} 个身份限制` : "暂时失败 · 保留已检查数据"}</span></div>`).join("");
+    if (data.screening) $("screening-note").textContent = `身份限制过滤已开启：排除 ${data.screening.excluded} 个有公民、国籍、永居、U.S. Person 或强制安全许可要求的岗位${data.screening.unreviewed ? `，另有 ${data.screening.unreviewed} 个待检查岗位暂不展示` : ""}。其余岗位未检出上述限制，工作许可与签证条件仍需核对 JD。`;
     const failed = data.sources.filter(s => !s.ok).length;
     const warnings = [];
     if (failed) warnings.push(`${failed} 个招聘源本次未能更新，相关岗位保留上次抓取结果。`);
