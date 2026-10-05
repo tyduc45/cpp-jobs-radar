@@ -80341,7 +80341,7 @@
       "last_seen": "2026-10-05T13:08:58.167132+00:00",
       "active": true,
       "misses": 0,
-      "notified_at": null
+      "notified_at": "2026-10-05T13:09:01.949695+00:00"
     },
     "97a1caf7f97932a26c404b89": {
       "id": "97a1caf7f97932a26c404b89",
@@ -80374,7 +80374,7 @@
       "last_seen": "2026-10-05T13:08:58.167132+00:00",
       "active": true,
       "misses": 0,
-      "notified_at": null
+      "notified_at": "2026-10-05T13:09:01.949695+00:00"
     },
     "d19cedf1e64c52997fc837cd": {
       "id": "d19cedf1e64c52997fc837cd",
@@ -80407,7 +80407,7 @@
       "last_seen": "2026-10-05T13:08:58.167132+00:00",
       "active": true,
       "misses": 0,
-      "notified_at": null
+      "notified_at": "2026-10-05T13:09:01.949695+00:00"
     },
     "ec20fd5da95f0a414971bbf1": {
       "id": "ec20fd5da95f0a414971bbf1",
@@ -80440,7 +80440,7 @@
       "last_seen": "2026-10-05T13:08:58.167132+00:00",
       "active": true,
       "misses": 0,
-      "notified_at": null
+      "notified_at": "2026-10-05T13:09:01.949695+00:00"
     },
     "6e9a705a0d193de301f82001": {
       "id": "6e9a705a0d193de301f82001",
@@ -80473,7 +80473,7 @@
       "last_seen": "2026-10-05T13:08:58.167132+00:00",
       "active": true,
       "misses": 0,
-      "notified_at": null
+      "notified_at": "2026-10-05T13:09:01.949695+00:00"
     },
     "44ce30bc189e68dd0f7bf00b": {
       "id": "44ce30bc189e68dd0f7bf00b",
@@ -80506,7 +80506,7 @@
       "last_seen": "2026-10-05T13:08:58.167132+00:00",
       "active": true,
       "misses": 0,
-      "notified_at": null
+      "notified_at": "2026-10-05T13:09:01.949695+00:00"
     },
     "57d32476952be2e5583471f5": {
       "id": "57d32476952be2e5583471f5",
@@ -80539,7 +80539,7 @@
       "last_seen": "2026-10-05T13:08:58.167132+00:00",
       "active": true,
       "misses": 0,
-      "notified_at": null
+      "notified_at": "2026-10-05T13:09:01.949695+00:00"
     },
     "abc461301e71af18b9aa4780": {
       "id": "abc461301e71af18b9aa4780",
@@ -80572,7 +80572,7 @@
       "last_seen": "2026-10-05T13:08:58.167132+00:00",
       "active": true,
       "misses": 0,
-      "notified_at": null
+      "notified_at": "2026-10-05T13:09:01.949695+00:00"
     }
   },
   "last_attempt": "2026-10-05T13:08:58.167132+00:00",
@@ -80841,5 +80841,5 @@
   ],
   "last_new_count": 8,
   "last_success": "2026-10-05T13:08:58.167132+00:00",
-  "last_email_sent": "2026-10-03T14:49:14.542103+00:00"
+  "last_email_sent": "2026-10-05T13:09:01.949695+00:00"
 }
