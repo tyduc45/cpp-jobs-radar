@@ -2,6 +2,7 @@ import json
 import os
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -106,7 +107,8 @@ class DeliveryGateTests(unittest.TestCase):
         self.assertFalse(is_visible(stale))
 
     def test_json_and_digest_and_smtp_share_same_gate(self):
-        allowed = {**self.make_job(), "active": True, "first_seen": "now", "last_seen": "now"}
+        now = datetime.now(timezone.utc).isoformat()
+        allowed = {**self.make_job(), "active": True, "first_seen": now, "last_seen": now}
         blocked = {**self.make_job("Must be a US citizen.", "https://example.com/blocked"),
                    "active": True, "first_seen": "now", "last_seen": "now"}
         legacy = {**allowed, "id": "legacy", "url": "https://example.com/legacy"}

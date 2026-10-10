@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -99,7 +100,7 @@ class EmailTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "state.json"
             state = {"jobs": {}}
-            radar.merge_results(state, [result([job()])], "2026-09-27")
+            radar.merge_results(state, [result([job()])], datetime.now(timezone.utc).isoformat())
             radar.write_json(path, state)
             env = {"SMTP_HOST": "example.com", "SMTP_USER": "test@example.com", "SMTP_PASSWORD": "dummy", "MAIL_TO": "recipient@example.com"}
             config = {"site_url": "https://example.com"}
@@ -121,13 +122,15 @@ class EmailTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {}, clear=True):
             path = Path(directory) / "state.json"
             state = {"jobs": {}}
-            radar.merge_results(state, [result([job()])], "now")
+            radar.merge_results(state, [result([job()])], datetime.now(timezone.utc).isoformat())
             radar.write_json(path, state)
             self.assertEqual(radar.notify({"site_url": "https://example.com"}, path), 2)
             self.assertIsNone(radar.read_json(path)["jobs"][job()["id"]]["notified_at"])
 
     def test_digest_has_all_new_jobs_attachment_and_safe_html(self):
-        jobs = [{**job(f"https://example.com/{i}"), "first_seen": "today", "title": "<img src=x> C++"} for i in range(75)]
+        now = datetime.now(timezone.utc).isoformat()
+        jobs = [{**job(f"https://example.com/{i}"), "active": True, "last_seen": now,
+                 "first_seen": now, "title": "<img src=x> C++"} for i in range(75)]
         message = radar.build_digest(jobs, {"site_url": "https://example.com"}, "me@example.com", "you@example.com")
         self.assertIn("&lt;img", message.get_body(preferencelist=("html",)).get_content())
         attachment = list(message.iter_attachments())[0]

@@ -38,7 +38,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test data and email integrity
-        run: python -m unittest discover -s tests -v
+        run: |
+          python -m unittest discover -s tests -v
+          node --test tests/freshness.test.cjs
       - name: Crawl public job feeds
         id: crawl
         continue-on-error: true

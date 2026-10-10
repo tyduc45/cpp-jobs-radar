@@ -13,6 +13,21 @@ function date(value, time = false) {
   return new Intl.DateTimeFormat("zh-CN", { timeZone: data.timezone || "Australia/Sydney", year: "numeric", month: "2-digit", day: "2-digit", ...(time ? { hour: "2-digit", minute: "2-digit", hour12: false } : {}) }).format(new Date(value));
 }
 function render() {
+  const currentJobs = RadarFreshness.currentJobs(data);
+  const hidden = RadarFreshness.hiddenCount(data);
+  $("total").textContent = currentJobs.length.toLocaleString();
+  $("new-total").textContent = currentJobs.filter(j => age(j.first_seen) <= 1).length.toLocaleString();
+  $("companies-total").textContent = new Set(currentJobs.map(j => j.company)).size;
+  $("intern-total").textContent = currentJobs.filter(j => j.contract === "intern").length;
+  $("freshness-note").textContent = `每日核对官方招聘列表，本次自动撤下 ${data.freshness?.closed_this_run || 0} 个岗位。超过 ${data.freshness?.max_unverified_hours || 72} 小时未确认或已过明确截止时间的岗位自动隐藏${hidden ? `（当前 ${hidden} 个）` : ""}。`;
+  const warnings = [];
+  const failed = data.sources.filter(s => !s.ok).length;
+  if (failed) warnings.push(`${failed} 个招聘源本次未能更新，暂时保留仍在有效确认期内的岗位。`);
+  if (hidden) warnings.push(`${hidden} 个岗位已过确认有效期、申请截止时间或停止跟踪，暂不展示。`);
+  if (!data.last_success || age(data.last_success) > 2) warnings.push("数据已超过 48 小时未成功更新，请查看页面底部的运行记录。");
+  $("notice").hidden = !warnings.length;
+  $("notice").textContent = warnings.join(" ");
+  $("source-list").innerHTML = data.sources.map(s => `<div class="source-row"><b>${escaped(s.company)}</b><span class="${s.ok ? "" : "failed"}">${currentJobs.filter(j => j.source_id === s.id).length} 个显示${s.ok ? ` / ${s.excluded ?? 0} 个身份限制` : " · 更新失败"}</span></div>`).join("");
   for (const [id, value] of [["all-jobs", ""], ["intern-jobs", "intern"]]) {
     const active = $("contract").value === value;
     $(id).classList.toggle("active", active);
@@ -21,7 +36,7 @@ function render() {
   const query = $("search").value.toLowerCase().trim().split(/\s+/).filter(Boolean);
   const location = $("location").value.toLowerCase().trim();
   const period = Number($("period").value);
-  const rows = data.jobs.filter(job => {
+  const rows = currentJobs.filter(job => {
     const haystack = `${job.title} ${job.company} ${job.department} ${job.excerpt}`.toLowerCase();
     return query.every(word => haystack.includes(word)) && job.location.toLowerCase().includes(location)
       && (!$("company").value || job.company === $("company").value)
@@ -65,24 +80,18 @@ async function init() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     data = await response.json();
     if (!Array.isArray(data.jobs) || !Array.isArray(data.sources)) throw new Error("Invalid job data");
-    const companies = [...new Set(data.jobs.map(j => j.company))].sort();
+    const currentJobs = RadarFreshness.currentJobs(data);
+    const previousCompany = $("company").value, previousCountry = $("country").value;
+    const companies = [...new Set(currentJobs.map(j => j.company))].sort();
     $("company").innerHTML = '<option value="">全部公司</option>' + companies.map(c => `<option value="${escaped(c)}">${escaped(c)}</option>`).join("");
-    const countries = [...new Set(data.jobs.flatMap(j => j.countries))].sort((a, b) => (data.country_labels[a] || a).localeCompare(data.country_labels[b] || b, "zh-CN"));
+    const countries = [...new Set(currentJobs.flatMap(j => j.countries))].sort((a, b) => (data.country_labels[a] || a).localeCompare(data.country_labels[b] || b, "zh-CN"));
     $("country").innerHTML = '<option value="">全部国家 / 地区</option>' + countries.map(c => `<option value="${escaped(c)}">${escaped(data.country_labels[c] || c)}</option>`).join("") + '<option value="unknown">未注明 / 无法识别</option>';
-    $("total").textContent = data.jobs.length.toLocaleString();
-    $("new-total").textContent = data.jobs.filter(j => age(j.first_seen) <= 1).length.toLocaleString();
-    $("companies-total").textContent = companies.length;
-    $("intern-total").textContent = data.jobs.filter(j => j.contract === "intern").length;
+    if (companies.includes(previousCompany)) $("company").value = previousCompany;
+    if (countries.includes(previousCountry) || previousCountry === "unknown") $("country").value = previousCountry;
     $("sources-total").textContent = `${data.sources.filter(s => s.ok).length}/${data.sources.length}`;
     $("last-update").textContent = `最近抓取 ${date(data.last_attempt, true)}`;
     $("source-summary").textContent = `${data.sources.length} 个公司招聘源`;
-    $("source-list").innerHTML = data.sources.map(s => `<div class="source-row"><b>${escaped(s.company)}</b><span class="${s.ok ? "" : "failed"}">${s.ok ? `${s.eligible ?? s.matched} 个显示 / ${s.excluded ?? 0} 个身份限制` : "暂时失败 · 保留已检查数据"}</span></div>`).join("");
     if (data.screening) $("screening-note").textContent = `身份限制过滤已开启：排除 ${data.screening.excluded} 个有公民、国籍、永居、U.S. Person 或强制安全许可要求的岗位${data.screening.unreviewed ? `，另有 ${data.screening.unreviewed} 个待检查岗位暂不展示` : ""}。其余岗位未检出上述限制，工作许可与签证条件仍需核对 JD。`;
-    const failed = data.sources.filter(s => !s.ok).length;
-    const warnings = [];
-    if (failed) warnings.push(`${failed} 个招聘源本次未能更新，相关岗位保留上次抓取结果。`);
-    if (!data.last_success || age(data.last_success) > 2) warnings.push("数据已超过 48 小时未成功更新，请查看页面底部的运行记录。");
-    if (warnings.length) { $("notice").hidden = false; $("notice").textContent = warnings.join(" "); }
     render();
   } catch (error) {
     $("jobs").innerHTML = '<div class="empty">岗位数据暂时无法加载。<br>请稍后刷新，或查看 GitHub 运行记录。</div>';
@@ -92,3 +101,6 @@ async function init() {
   }
 }
 init();
+setInterval(() => { if (data.last_attempt) render(); }, 60000);
+setInterval(init, 15 * 60000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && data.last_attempt) render(); });

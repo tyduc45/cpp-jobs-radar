@@ -1,7 +1,7 @@
 {
   "timezone": "Australia/Sydney",
   "site_url": "https://tyduc45.github.io/cpp-jobs-radar/",
-  "close_after_successful_misses": 3,
+  "max_unverified_hours": 72,
   "sources": [
     {
       "type": "greenhouse",

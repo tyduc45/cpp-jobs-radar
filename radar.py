@@ -27,6 +27,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 from classify import COUNTRIES, classify
 from eligibility import SCREENING_VERSION, screen_job, passes_screening, is_visible
+from freshness import is_current, visible_until, DEFAULT_MAX_UNVERIFIED_HOURS
 
 ROOT = Path(__file__).resolve().parent
 CPP = re.compile(r"(?<![A-Za-z0-9_])(?:c\s*\+\s*\+|c＋＋|cpp\b|c\s+plus\s+plus)(?![A-Za-z_])", re.I)
@@ -121,6 +122,10 @@ def fetch_source(source):
         rows = response["jobs"]
         if not isinstance(rows, list):
             raise ValueError("Invalid Greenhouse jobs response")
+        if response.get("meta", {}).get("total", len(rows)) != len(rows):
+            raise ValueError("Incomplete Greenhouse snapshot; refusing to expire jobs")
+        if len({row["id"] for row in rows}) != len(rows):
+            raise ValueError("Duplicate Greenhouse IDs; refusing incomplete snapshot")
         for row in rows:
             total += 1
             location = (row.get("location") or {}).get("name", "")
@@ -130,6 +135,7 @@ def fetch_source(source):
             job = make_job(source, row["id"], row["title"], row.get("content", ""), row["absolute_url"], location,
                            department=", ".join(d["name"] for d in row.get("departments", [])),
                            posted_at=row.get("first_published", ""), updated_at=row.get("updated_at", ""),
+                           application_deadline=row.get("application_deadline", ""),
                            remote=bool(re.search(r"\bremote\b", location, re.I)), employment_type=employment,
                            workplace_hint=workplace, salary="")
             if job:
@@ -137,6 +143,7 @@ def fetch_source(source):
     elif kind == "lever":
         offset, page_size = 0, 100
         seen_pages = set()
+        seen_ids = set()
         while True:
             host = "api.eu.lever.co" if source.get("region") == "eu" else "api.lever.co"
             rows = fetch_json(f"https://{host}/v0/postings/{board}?mode=json&skip={offset}&limit={page_size}")
@@ -146,6 +153,9 @@ def fetch_source(source):
             if rows and fingerprint in seen_pages:
                 raise ValueError("Lever pagination repeated; refusing incomplete snapshot")
             seen_pages.add(fingerprint)
+            if len(set(fingerprint)) != len(fingerprint) or seen_ids.intersection(fingerprint):
+                raise ValueError("Overlapping Lever pages; refusing incomplete snapshot")
+            seen_ids.update(fingerprint)
             for row in rows:
                 total += 1
                 cat = row.get("categories") or {}
@@ -204,10 +214,10 @@ def write_json(path, value):
     temp.replace(path)
 
 
-def merge_results(state, results, now, close_after=3):
+def merge_results(state, results, now):
     """Failures never expire jobs. Only complete successful snapshots count."""
     jobs = state.setdefault("jobs", {})
-    fresh = 0
+    fresh = closed = 0
     for result in results:
         if not result["ok"]:
             continue
@@ -219,14 +229,19 @@ def merge_results(state, results, now, close_after=3):
             if not old and passes_screening(job):
                 fresh += 1
             jobs[key] = {**old, **job, "first_seen": old.get("first_seen", now), "last_seen": now,
-                         "active": True, "misses": 0, "notified_at": old.get("notified_at")}
+                         "active": True, "misses": 0, "closed_at": None, "closure_reason": None,
+                         "notified_at": old.get("notified_at")}
         for key, job in jobs.items():
             if job["source_id"] == result["id"] and key not in seen:
                 job["misses"] = job.get("misses", 0) + 1
-                if job["misses"] >= close_after:
+                if job.get("active", False):
                     job["active"] = False
+                    job["closed_at"] = now
+                    job["closure_reason"] = "absent_from_complete_feed"
+                    closed += 1
     state.update(version=1, last_attempt=now,
-                 sources=[{k: v for k, v in r.items() if k != "jobs"} for r in results], last_new_count=fresh)
+                 sources=[{k: v for k, v in r.items() if k != "jobs"} for r in results],
+                 last_new_count=fresh, last_closed_count=closed)
     if any(r["ok"] for r in results):
         state["last_success"] = now
     return fresh
@@ -249,17 +264,23 @@ def crawl(config, state_path):
             results.append(result)
     state = read_json(state_path, {"version": 1, "jobs": {}})
     now = datetime.now(timezone.utc).isoformat()
-    count = merge_results(state, sorted(results, key=lambda r: r["company"]), now,
-                          config.get("close_after_successful_misses", 3))
+    count = merge_results(state, sorted(results, key=lambda r: r["company"]), now)
     write_json(state_path, state)
     print(f"Discovered {count} new jobs; {sum(r['ok'] for r in results)}/{len(results)} sources succeeded.")
+    print(f"Removed {state['last_closed_count']} jobs absent from complete feeds.")
     return 0 if any(r["ok"] for r in results) else 1
 
 
 def export_site(config, state_path, output):
     state = read_json(state_path, {"jobs": {}})
-    jobs = [{k: v for k, v in job.items() if k not in ("notified_at", "misses", "source_job_id", "screening")}
-            for job in state["jobs"].values() if is_visible(job)]
+    now = datetime.now(timezone.utc)
+    jobs = [{**{k: v for k, v in job.items() if k not in ("notified_at", "misses", "source_job_id", "screening")},
+             "visible_until": visible_until(job, config).isoformat()}
+            for job in state["jobs"].values() if is_current(job, config, now)]
+    freshness = {"max_unverified_hours": config.get("max_unverified_hours", DEFAULT_MAX_UNVERIFIED_HOURS),
+        "closed_this_run": state.get("last_closed_count", 0),
+        "closed_total": sum(not j.get("active", False) for j in state["jobs"].values()),
+        "hidden_unverified": sum(is_visible(j) and not is_current(j, config, now) for j in state["jobs"].values())}
     active = [j for j in state["jobs"].values() if j["active"]]
     screening = {"version": SCREENING_VERSION,
         "excluded": sum(bool(j.get("screening", {}).get("excluded")) for j in active),
@@ -268,15 +289,17 @@ def export_site(config, state_path, output):
     write_json(output, {"generated_at": datetime.now(timezone.utc).isoformat(), "timezone": config["timezone"],
         "last_success": state.get("last_success"), "last_attempt": state.get("last_attempt"),
         "new_count": state.get("last_new_count", 0), "sources": state.get("sources", []), "jobs": jobs,
-        "country_labels": {code: entry[0] for code, entry in COUNTRIES.items()}, "screening": screening})
+        "country_labels": {code: entry[0] for code, entry in COUNTRIES.items()}, "screening": screening,
+        "freshness": freshness})
     print(f"Exported {len(jobs)} active jobs to {output}")
 
 
-def build_digest(jobs, config, sender, recipient):
+def build_digest(jobs, config, sender, recipient, now=None):
     # Defense in depth: no caller can accidentally bypass the common JD filter.
-    jobs = [job for job in jobs if passes_screening(job)]
+    now = now or datetime.now(timezone.utc)
+    jobs = [job for job in jobs if is_current(job, config, now)]
     if not jobs:
-        raise ValueError("No screened, unrestricted jobs to include in an email")
+        raise ValueError("No current, screened, unrestricted jobs to include in an email")
     digest_id = hashlib.sha256("\n".join(sorted(j["id"] for j in jobs)).encode()).hexdigest()[:32]
     message = EmailMessage()
     message["Subject"] = f"[C++ Jobs Radar] 发现 {len(jobs)} 个新岗位"
@@ -307,7 +330,8 @@ def build_digest(jobs, config, sender, recipient):
 
 def notify(config, state_path):
     state = read_json(state_path, {"jobs": {}})
-    pending = sorted((j for j in state["jobs"].values() if is_visible(j) and not j.get("notified_at")),
+    now = datetime.now(timezone.utc)
+    pending = sorted((j for j in state["jobs"].values() if is_current(j, config, now) and not j.get("notified_at")),
                      key=lambda j: (j["first_seen"], j["company"], j["title"]), reverse=True)
     required = ["SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "MAIL_TO"]
     missing = [name for name in required if not os.environ.get(name)]
@@ -319,7 +343,8 @@ def notify(config, state_path):
         return 0
     sender = os.environ.get("MAIL_FROM") or os.environ["SMTP_USER"]
     recipient = os.environ["MAIL_TO"]
-    message = build_digest(pending, config, sender, recipient)
+    # Use the same cutoff for queue selection, message contents and receipts.
+    message = build_digest(pending, config, sender, recipient, now=now)
     port = int(os.environ.get("SMTP_PORT") or "465")
     context = ssl.create_default_context()
     host = os.environ["SMTP_HOST"]
