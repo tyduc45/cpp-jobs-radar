@@ -95682,7 +95682,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-17T13:03:03.818845+00:00"
     },
     "e70ae4f3baa1b574144ceee4": {
       "id": "e70ae4f3baa1b574144ceee4",
@@ -95838,7 +95838,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-17T13:03:03.818845+00:00"
     },
     "6d68b47b13fc05361666a37a": {
       "id": "6d68b47b13fc05361666a37a",
@@ -95874,7 +95874,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-17T13:03:03.818845+00:00"
     },
     "f98a618eaddc2ecd80930651": {
       "id": "f98a618eaddc2ecd80930651",
@@ -95909,7 +95909,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-17T13:03:03.818845+00:00"
     },
     "b5aa79417fc86486fbb57185": {
       "id": "b5aa79417fc86486fbb57185",
@@ -95944,7 +95944,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-17T13:03:03.818845+00:00"
     },
     "17949009f2920e68588246d7": {
       "id": "17949009f2920e68588246d7",
@@ -96057,7 +96057,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-17T13:03:03.818845+00:00"
     },
     "58e57b421b3d45cd000a78da": {
       "id": "58e57b421b3d45cd000a78da",
@@ -96092,7 +96092,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-17T13:03:03.818845+00:00"
     }
   },
   "last_attempt": "2026-10-17T13:03:00.035058+00:00",
@@ -96361,6 +96361,6 @@
   ],
   "last_new_count": 7,
   "last_success": "2026-10-17T13:03:00.035058+00:00",
-  "last_email_sent": "2026-10-16T13:04:12.210861+00:00",
+  "last_email_sent": "2026-10-17T13:03:03.818845+00:00",
   "last_closed_count": 28
 }
