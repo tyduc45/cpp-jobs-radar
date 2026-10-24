@@ -100110,7 +100110,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-24T13:03:12.977471+00:00"
     },
     "d291e85cbe09bb56d9f055a7": {
       "id": "d291e85cbe09bb56d9f055a7",
@@ -100146,7 +100146,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-24T13:03:12.977471+00:00"
     },
     "5833f1835d54496f49b63fc7": {
       "id": "5833f1835d54496f49b63fc7",
@@ -100182,7 +100182,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-24T13:03:12.977471+00:00"
     },
     "989e8e111733a52adc4c7313": {
       "id": "989e8e111733a52adc4c7313",
@@ -100218,7 +100218,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-24T13:03:12.977471+00:00"
     },
     "f8d4d87ec572bc93ff7610c3": {
       "id": "f8d4d87ec572bc93ff7610c3",
@@ -100254,7 +100254,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-24T13:03:12.977471+00:00"
     },
     "ed86dd491ff7b24bfb1acf8a": {
       "id": "ed86dd491ff7b24bfb1acf8a",
@@ -100289,7 +100289,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-24T13:03:12.977471+00:00"
     },
     "68b55a2af6a2ba4c4c6ce160": {
       "id": "68b55a2af6a2ba4c4c6ce160",
@@ -100325,7 +100325,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-24T13:03:12.977471+00:00"
     },
     "19ce8e23661232bd827da9e3": {
       "id": "19ce8e23661232bd827da9e3",
@@ -100359,7 +100359,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-24T13:03:12.977471+00:00"
     },
     "1d2a4eab43c33ec50fe1ed43": {
       "id": "1d2a4eab43c33ec50fe1ed43",
@@ -100395,7 +100395,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-10-24T13:03:12.977471+00:00"
     }
   },
   "last_attempt": "2026-10-24T13:03:09.047034+00:00",
@@ -100664,6 +100664,6 @@
   ],
   "last_new_count": 9,
   "last_success": "2026-10-24T13:03:09.047034+00:00",
-  "last_email_sent": "2026-10-23T13:04:19.384041+00:00",
+  "last_email_sent": "2026-10-24T13:03:12.977471+00:00",
   "last_closed_count": 15
 }
