@@ -104051,7 +104051,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-02T13:03:40.420003+00:00"
     },
     "e9114cdb71f1f162fbd88bd7": {
       "id": "e9114cdb71f1f162fbd88bd7",
@@ -104087,7 +104087,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-02T13:03:40.420003+00:00"
     }
   },
   "last_attempt": "2026-11-02T13:03:36.308537+00:00",
@@ -104356,6 +104356,6 @@
   ],
   "last_new_count": 2,
   "last_success": "2026-11-02T13:03:36.308537+00:00",
-  "last_email_sent": "2026-10-31T13:02:59.406453+00:00",
+  "last_email_sent": "2026-11-02T13:03:40.420003+00:00",
   "last_closed_count": 19
 }
