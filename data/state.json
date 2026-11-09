@@ -108685,7 +108685,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-09T13:02:48.577007+00:00"
     }
   },
   "last_attempt": "2026-11-09T13:02:43.628363+00:00",
@@ -108954,6 +108954,6 @@
   ],
   "last_new_count": 1,
   "last_success": "2026-11-09T13:02:43.628363+00:00",
-  "last_email_sent": "2026-11-07T13:02:30.135872+00:00",
+  "last_email_sent": "2026-11-09T13:02:48.577007+00:00",
   "last_closed_count": 8
 }
