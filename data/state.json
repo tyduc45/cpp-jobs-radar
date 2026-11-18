@@ -112054,7 +112054,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-18T13:02:30.030189+00:00"
     },
     "5922cc93be917a5c7c4e6933": {
       "id": "5922cc93be917a5c7c4e6933",
@@ -112089,7 +112089,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-18T13:02:30.030189+00:00"
     },
     "cede4ad3d7de80bc77f9e46e": {
       "id": "cede4ad3d7de80bc77f9e46e",
@@ -112124,7 +112124,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-18T13:02:30.030189+00:00"
     },
     "1811fa365735573e85155a07": {
       "id": "1811fa365735573e85155a07",
@@ -112160,7 +112160,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-18T13:02:30.030189+00:00"
     },
     "7562aeaae5543c8e438a274b": {
       "id": "7562aeaae5543c8e438a274b",
@@ -112436,7 +112436,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-18T13:02:30.030189+00:00"
     },
     "c3e13928d74a3a9f25de44f5": {
       "id": "c3e13928d74a3a9f25de44f5",
@@ -112472,7 +112472,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-18T13:02:30.030189+00:00"
     },
     "891a93f70feea6a7f7a33c3b": {
       "id": "891a93f70feea6a7f7a33c3b",
@@ -112508,7 +112508,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-18T13:02:30.030189+00:00"
     }
   },
   "last_attempt": "2026-11-18T13:02:25.883591+00:00",
@@ -112777,6 +112777,6 @@
   ],
   "last_new_count": 7,
   "last_success": "2026-11-18T13:02:25.883591+00:00",
-  "last_email_sent": "2026-11-17T13:02:23.207666+00:00",
+  "last_email_sent": "2026-11-18T13:02:30.030189+00:00",
   "last_closed_count": 22
 }
