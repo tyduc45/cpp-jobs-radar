@@ -112542,7 +112542,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-19T13:02:31.479008+00:00"
     },
     "8acf1bd96f2fb19847553625": {
       "id": "8acf1bd96f2fb19847553625",
@@ -112576,7 +112576,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-19T13:02:31.479008+00:00"
     },
     "4aeb7a8c65f677dfbb08d92e": {
       "id": "4aeb7a8c65f677dfbb08d92e",
@@ -112612,7 +112612,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-19T13:02:31.479008+00:00"
     },
     "c74eb83baa04fca43fd60e17": {
       "id": "c74eb83baa04fca43fd60e17",
@@ -112648,7 +112648,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-19T13:02:31.479008+00:00"
     },
     "54f1672f44c882ab705e8790": {
       "id": "54f1672f44c882ab705e8790",
@@ -112684,7 +112684,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-19T13:02:31.479008+00:00"
     },
     "febe64bbf1477699f637971a": {
       "id": "febe64bbf1477699f637971a",
@@ -112966,7 +112966,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-19T13:02:31.479008+00:00"
     },
     "0cd194e576d7230254e0a0bd": {
       "id": "0cd194e576d7230254e0a0bd",
@@ -113001,7 +113001,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-19T13:02:31.479008+00:00"
     },
     "911bd7668156798585ae1c7f": {
       "id": "911bd7668156798585ae1c7f",
@@ -113036,7 +113036,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-19T13:02:31.479008+00:00"
     }
   },
   "last_attempt": "2026-11-19T13:02:27.214059+00:00",
@@ -113305,6 +113305,6 @@
   ],
   "last_new_count": 8,
   "last_success": "2026-11-19T13:02:27.214059+00:00",
-  "last_email_sent": "2026-11-18T13:02:30.030189+00:00",
+  "last_email_sent": "2026-11-19T13:02:31.479008+00:00",
   "last_closed_count": 18
 }
