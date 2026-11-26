@@ -19,7 +19,7 @@ def rank_role(title, description="", contract=""):
         return "P4", "高级 / 资深"
     if re.search(r"中级|\bmid[- ]level\b|\bengineer II\b", title, re.I) or (years or 0) >= 3:
         return "P3", "有经验"
-    if contract == "intern" or re.search(r"实习|应届|校招|校园招聘|毕业生|管培生|\b(intern(ship)?|new grad(uate)?|graduate|co-op)\b", title, re.I):
+    if contract == "intern" or re.search(r"实习|应届|校招|校园招聘|毕业生|管培生|\b(intern(ship)?|new grad(?:uate)?s?|graduate|co-op)\b", title, re.I):
         return "P0", "校招 / 实习"
     if re.search(r"初级|助理|\b(junior|entry[- ]level|early career)\b", title, re.I) or re.search(r"经验不限|不限经验|无需工作经验|欢迎应届", text) or years is not None:
         return "P1", "入门 / 低年限"

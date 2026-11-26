@@ -152,6 +152,24 @@
       "type": "tencent",
       "board": "china",
       "company": "腾讯"
+    },
+    {
+      "type": "lever",
+      "board": "weride",
+      "company": "文远知行",
+      "china_only": true
+    },
+    {
+      "type": "nvidia",
+      "board": "china",
+      "company": "NVIDIA 英伟达",
+      "china_only": true
+    },
+    {
+      "type": "ubisoft",
+      "board": "china",
+      "company": "育碧中国",
+      "china_only": true
     }
   ]
 }

@@ -26,6 +26,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 from seniority import rank_role
+import employer_feeds
 import tencent
 from classify import COUNTRIES, classify
 from eligibility import SCREENING_VERSION, screen_job, passes_screening, is_visible
@@ -33,7 +34,7 @@ from freshness import is_current, visible_until, DEFAULT_MAX_UNVERIFIED_HOURS
 
 ROOT = Path(__file__).resolve().parent
 CPP = re.compile(r"(?<![A-Za-z0-9_])(?:c\s*\+\s*\+|c＋＋|cpp\b|c\s+plus\s+plus)(?![A-Za-z_])", re.I)
-CN_TECH = re.compile(CPP.pattern + r"|引擎|CUDA|HPC|高性能计算|Linux|驱动开发|驱动程序|驱动工程师|底层驱动|编译器", re.I)
+CN_TECH = re.compile(CPP.pattern + r"|引擎|CUDA|HPC|高性能计算|Linux|驱动开发|驱动程序|驱动工程师|底层驱动|编译器|\b(?:compilers?|LLVM|device drivers?|game engines?|rendering engines?)\b", re.I)
 USER_AGENT = "CppJobsRadar/1.0 (+https://github.com/tyduc45/cpp-jobs-radar)"
 
 
@@ -74,10 +75,15 @@ def canonical_url(value):
     return urlunsplit((parts.scheme.lower(), parts.netloc.lower(), parts.path.rstrip("/"), urlencode(sorted(query)), ""))
 
 
-def fetch_json(url):
+def fetch_json(url, payload=None):
     for attempt in range(3):
         try:
-            request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
+            headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+            data = None
+            if payload is not None:
+                data = json.dumps(payload).encode()
+                headers["Content-Type"] = "application/json"
+            request = Request(url, headers=headers, data=data)
             with urlopen(request, timeout=45) as response:
                 return json.load(response)
         except (HTTPError, URLError, TimeoutError) as exc:
@@ -99,15 +105,17 @@ def source_id(source):
 
 def make_job(source, raw_id, title, description, url, location="", **extra):
     title, description = plain(title), plain(description)
-    matcher = CN_TECH if source["type"] == "tencent" else CPP
+    matcher = CN_TECH if source.get("china_only") or source["type"] == "tencent" else CPP
     match = matcher.search(title) or matcher.search(description)
     if not match:
+        return None
+    attributes = classify(title, plain(location), description, extra.get("employment_type", ""),
+                          extra.pop("workplace_hint", ""), extra.pop("explicit_countries", None))
+    if source.get("china_only") and "CN" not in attributes["countries"]:
         return None
     url = canonical_url(url)
     excerpt_match = matcher.search(description)
     excerpt = description[max(0, excerpt_match.start() - 90):excerpt_match.end() + 220] if excerpt_match else title
-    attributes = classify(title, plain(location), description, extra.get("employment_type", ""),
-                          extra.pop("workplace_hint", ""), extra.pop("explicit_countries", None))
     priority, seniority = rank_role(title, description, attributes["contract"])
     return {
         "priority": priority, "seniority": seniority,
@@ -131,6 +139,13 @@ def fetch_source(source):
             job = make_job(source, key, row["RecruitPostName"], description,
                            f"https://careers.tencent.com/jobdesc.html?postId={key}", row["LocationName"],
                            explicit_countries=["CN"], department=row.get("BGName", ""))
+            if job:
+                jobs.append(job)
+    elif kind in ("nvidia", "ubisoft"):
+        postings = employer_feeds.nvidia if kind == "nvidia" else employer_feeds.ubisoft
+        for fields in postings(fetch_json):
+            total += 1
+            job = make_job(source, **fields)
             if job:
                 jobs.append(job)
     elif kind == "greenhouse":
