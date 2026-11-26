@@ -122416,7 +122416,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-26T13:02:11.944264+00:00"
     },
     "e39535c4d666902467caee82": {
       "priority": "P4",
@@ -122448,7 +122448,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-26T13:02:11.944264+00:00"
     }
   },
   "last_attempt": "2026-11-26T13:02:07.750258+00:00",
@@ -122786,6 +122786,6 @@
   ],
   "last_new_count": 2,
   "last_success": "2026-11-26T13:02:07.750258+00:00",
-  "last_email_sent": "2026-11-26T04:37:08.268535+00:00",
+  "last_email_sent": "2026-11-26T13:02:11.944264+00:00",
   "last_closed_count": 2
 }
