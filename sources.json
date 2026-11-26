@@ -147,6 +147,11 @@
       "type": "ashby",
       "board": "redis",
       "company": "Redis"
+    },
+    {
+      "type": "tencent",
+      "board": "china",
+      "company": "腾讯"
     }
   ]
 }

@@ -47,6 +47,7 @@ function render() {
       && (!$("contract").value || job.contract === $("contract").value);
   });
   rows.sort((a, b) => {
+    if ($("sort").value === "priority" && a.priority !== b.priority) return (a.priority || "P2").localeCompare(b.priority || "P2");
     if ($("sort").value === "company") return a.company.localeCompare(b.company) || a.title.localeCompare(b.title);
     if ($("sort").value === "title" && a.match !== b.match) return a.match === "title" ? -1 : 1;
     return b.first_seen.localeCompare(a.first_seen) || a.company.localeCompare(b.company);
@@ -55,9 +56,9 @@ function render() {
   page = Math.min(page, pages);
   $("result-count").textContent = `${rows.length.toLocaleString()} 个结果`;
   $("jobs").innerHTML = rows.slice((page - 1) * pageSize, page * pageSize).map(job => `<article class="job">
-    <div class="job-top"><span class="company-name">${escaped(job.company)}</span>${age(job.first_seen) <= 1 ? '<span class="badge new">新发现</span>' : ""}${job.match === "title" ? '<span class="badge match">标题含 C++</span>' : '<span class="badge">JD 提及 C++</span>'}${job.contract === "intern" ? '<span class="badge intern">实习 / Co-op</span>' : ""}</div>
+    <div class="job-top"><span class="company-name">${escaped(job.company)}</span>${age(job.first_seen) <= 1 ? '<span class="badge new">新发现</span>' : ""}${job.match === "title" ? '<span class="badge match">标题命中</span>' : '<span class="badge">JD 命中</span>'}${job.contract === "intern" ? '<span class="badge intern">实习 / Co-op</span>' : ""}</div>
     <h3><a href="${safeUrl(job.url)}" target="_blank" rel="noopener noreferrer">${escaped(job.title)}</a></h3>
-    <div class="job-meta"><span class="place">${escaped(job.location)}</span><span>${escaped(workplaceLabels[job.workplace] || workplaceLabels.unknown)}</span><span>${escaped(contractLabels[job.contract] || contractLabels.unknown)}</span>${job.salary ? `<span>${escaped(job.salary)}</span>` : ""}</div>
+    <div class="job-meta"><span>${escaped(job.priority || "P2")} · ${escaped(job.seniority || "资历未注明")}</span><span class="place">${escaped(job.location)}</span><span>${escaped(workplaceLabels[job.workplace] || workplaceLabels.unknown)}</span><span>${escaped(contractLabels[job.contract] || contractLabels.unknown)}</span>${job.salary ? `<span>${escaped(job.salary)}</span>` : ""}</div>
     <p class="excerpt">${escaped(job.excerpt)}</p>
     <div class="job-bottom"><span class="discovery">首次发现 ${date(job.first_seen)} · 最近确认 ${date(job.last_seen)}${job.posted_at ? `<br>来源发布日期 ${date(job.posted_at)}` : ""}</span><a class="jd-link" href="${safeUrl(job.url)}" target="_blank" rel="noopener noreferrer" aria-label="查看 ${escaped(job.company)} ${escaped(job.title)} 的原始 JD">查看 JD ↗</a></div></article>`).join("") || '<div class="empty">没有符合条件的岗位。<br>试试其他关键词，或重置筛选条件。</div>';
   $("page-info").textContent = `${page} / ${pages}`;

@@ -25,12 +25,15 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
+from seniority import rank_role
+import tencent
 from classify import COUNTRIES, classify
 from eligibility import SCREENING_VERSION, screen_job, passes_screening, is_visible
 from freshness import is_current, visible_until, DEFAULT_MAX_UNVERIFIED_HOURS
 
 ROOT = Path(__file__).resolve().parent
 CPP = re.compile(r"(?<![A-Za-z0-9_])(?:c\s*\+\s*\+|c＋＋|cpp\b|c\s+plus\s+plus)(?![A-Za-z_])", re.I)
+CN_TECH = re.compile(CPP.pattern + r"|引擎|CUDA|HPC|高性能计算|Linux|驱动开发|驱动程序|驱动工程师|底层驱动|编译器", re.I)
 USER_AGENT = "CppJobsRadar/1.0 (+https://github.com/tyduc45/cpp-jobs-radar)"
 
 
@@ -96,20 +99,23 @@ def source_id(source):
 
 def make_job(source, raw_id, title, description, url, location="", **extra):
     title, description = plain(title), plain(description)
-    match = CPP.search(title) or CPP.search(description)
+    matcher = CN_TECH if source["type"] == "tencent" else CPP
+    match = matcher.search(title) or matcher.search(description)
     if not match:
         return None
     url = canonical_url(url)
-    excerpt_match = CPP.search(description)
+    excerpt_match = matcher.search(description)
     excerpt = description[max(0, excerpt_match.start() - 90):excerpt_match.end() + 220] if excerpt_match else title
     attributes = classify(title, plain(location), description, extra.get("employment_type", ""),
                           extra.pop("workplace_hint", ""), extra.pop("explicit_countries", None))
+    priority, seniority = rank_role(title, description, attributes["contract"])
     return {
+        "priority": priority, "seniority": seniority,
         "id": hashlib.sha256(url.encode()).hexdigest()[:24],
         "source_id": source_id(source), "source_job_id": str(raw_id),
         "company": source["company"], "title": title, "url": url,
         "location": plain(location) or "未注明地点", "excerpt": excerpt,
-        "match": "title" if CPP.search(title) else "description", **extra, **attributes,
+        "match": "title" if matcher.search(title) else "description", **extra, **attributes,
         "screening": screen_job(title, description),
     }
 
@@ -117,7 +123,17 @@ def make_job(source, raw_id, title, description, url, location="", **extra):
 def fetch_source(source):
     kind, board = source["type"], source["board"]
     jobs, total = [], 0
-    if kind == "greenhouse":
+    if kind == "tencent":
+        for row in tencent.postings(fetch_json):
+            total += 1
+            key = str(row["PostId"])
+            description = " ".join([row["Responsibility"], row["Requirement"], row.get("RequireWorkYearsName") or ""])
+            job = make_job(source, key, row["RecruitPostName"], description,
+                           f"https://careers.tencent.com/jobdesc.html?postId={key}", row["LocationName"],
+                           explicit_countries=["CN"], department=row.get("BGName", ""))
+            if job:
+                jobs.append(job)
+    elif kind == "greenhouse":
         response = fetch_json(f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true")
         rows = response["jobs"]
         if not isinstance(rows, list):
@@ -197,7 +213,7 @@ def fetch_source(source):
     else:
         raise ValueError(f"Unknown source type: {kind}")
     return {"id": source_id(source), "company": source["company"], "ok": True, "scanned": total,
-            "matched": len(jobs), "eligible": sum(passes_screening(j) for j in jobs),
+            "complete": kind in ("greenhouse", "lever", "ashby"), "matched": len(jobs), "eligible": sum(passes_screening(j) for j in jobs),
             "excluded": sum(j["screening"]["excluded"] for j in jobs), "jobs": jobs}
 
 
@@ -231,6 +247,8 @@ def merge_results(state, results, now):
             jobs[key] = {**old, **job, "first_seen": old.get("first_seen", now), "last_seen": now,
                          "active": True, "misses": 0, "closed_at": None, "closure_reason": None,
                          "notified_at": old.get("notified_at")}
+        if not result.get("complete", result["id"].split(":")[0] in ("greenhouse", "lever", "ashby")):
+            continue
         for key, job in jobs.items():
             if job["source_id"] == result["id"] and key not in seen:
                 job["misses"] = job.get("misses", 0) + 1
@@ -285,7 +303,11 @@ def export_site(config, state_path, output):
     screening = {"version": SCREENING_VERSION,
         "excluded": sum(bool(j.get("screening", {}).get("excluded")) for j in active),
         "unreviewed": sum(j.get("screening", {}).get("version") != SCREENING_VERSION for j in active)}
+    for job in jobs:
+        if "priority" not in job:
+            job["priority"], job["seniority"] = rank_role(job["title"], contract=job.get("contract"))
     jobs.sort(key=lambda j: (j["first_seen"], j["company"], j["title"]), reverse=True)
+    jobs.sort(key=lambda j: j["priority"])
     write_json(output, {"generated_at": datetime.now(timezone.utc).isoformat(), "timezone": config["timezone"],
         "last_success": state.get("last_success"), "last_attempt": state.get("last_attempt"),
         "new_count": state.get("last_new_count", 0), "sources": state.get("sources", []), "jobs": jobs,
@@ -300,6 +322,7 @@ def build_digest(jobs, config, sender, recipient, now=None):
     jobs = [job for job in jobs if is_current(job, config, now)]
     if not jobs:
         raise ValueError("No current, screened, unrestricted jobs to include in an email")
+    jobs.sort(key=lambda j: j.get("priority") or rank_role(j["title"], contract=j.get("contract"))[0])
     digest_id = hashlib.sha256("\n".join(sorted(j["id"] for j in jobs)).encode()).hexdigest()[:32]
     message = EmailMessage()
     message["Subject"] = f"[C++ Jobs Radar] 发现 {len(jobs)} 个新岗位"
