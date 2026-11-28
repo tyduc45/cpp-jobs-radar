@@ -122676,7 +122676,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-28T13:02:13.604707+00:00"
     },
     "a067e8098ee13e30451b2fca": {
       "priority": "P4",
@@ -122714,7 +122714,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-28T13:02:13.604707+00:00"
     },
     "42fa3dbebe0fac7d3d6a529a": {
       "priority": "P4",
@@ -122747,7 +122747,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-28T13:02:13.604707+00:00"
     },
     "7f53f675176715e0604147d2": {
       "priority": "P4",
@@ -122782,7 +122782,7 @@
       "misses": 0,
       "closed_at": null,
       "closure_reason": null,
-      "notified_at": null
+      "notified_at": "2026-11-28T13:02:13.604707+00:00"
     }
   },
   "last_attempt": "2026-11-28T13:02:09.456963+00:00",
@@ -123120,6 +123120,6 @@
   ],
   "last_new_count": 4,
   "last_success": "2026-11-28T13:02:09.456963+00:00",
-  "last_email_sent": "2026-11-27T13:02:37.780953+00:00",
+  "last_email_sent": "2026-11-28T13:02:13.604707+00:00",
   "last_closed_count": 3
 }
